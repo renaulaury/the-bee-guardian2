@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!
+{% endblock %}
+
+{% block body %}
+	<h1 class="text-2xl text-center font-bold pt-5 mb-5">Users</h1>
+
+	<div class="users grid grid-cols-4 grid-rows-2 gap-2.5 pt-6">
+		{% for user in users.results %}
+
+			<div class="user bg-white p-4 rounded shadow border border-gray-200 flex flex-col justify-between">
+
+				<div class="top flex justify-between items-start mb-4">
+					<div>
+						<h2 class="font-bold text-lg leading-tight">
+							{{ user.name.title }}
+							{{ user.name.last }}
+							{{ user.name.first }}
+						</h2>
+
+						<p class="text-gray-500 text-sm mt-1">
+							<i class="ri-mail-line align-middle"></i>&nbsp;{{ user.email}}
+						</p>
+						<p class="text-gray-500 text-sm">
+							<i class="ri-smartphone-line align-middle"></i>&nbsp;{{ user.phone }}
+						</p>
+					</div>
+
+					<div>
+						<img src="{{ user.picture.large }}" alt="Avatar" class="w-16 h-16 rounded-full object-cover">
+					</div>
+				</div>
+
+				<div class="details border-t border-gray-100 pt-2 mt-auto flex justify-between items-end">
+					<div class="text-sm">
+						<i class="ri-map-pin-2-line text-gray-400"></i>
+						<span class="font-medium">{{ user.location.street.number }}
+							{{ user.location.street.name }}</span>
+						<br>
+						<p>{{ user.location.postcode }}
+							{{ user.location.city }}</p>
+						<p class="uppercase text-xs text-gray-400 font-semibold">{{ user.location.country }}</p>
+					</div>
+
+					<div>
+						<p class="plus text-xl text-blue-600 hover:text-blue-800 cursor-pointer">
+							<a href="#">
+								<i class="ri-folder-add-line"></i>
+							</a>
+						</p>
+					</div>
+				</div>
+
+				<div class="data">
+					<form action="{{ path('addMember') }}" method="post">
+						<input type="hidden" name="title" value="{{ user.name.title }}">
+						<input type="hidden" name="last" value="{{ user.name.last }}">
+						<input type="hidden" name="first" value="{{ user.name.first }}">
+						<input type="hidden" name="email" value="{{ user.email }}">
+						<input type="hidden" name="phone" value="{{ user.phone }}">
+						<input type="hidden" name="picture" value="{{ user.picture.large }}">
+						<input type="hidden" name="streetnumber" value="{{ user.location.street.number }}">
+						<input type="hidden" name="streetname" value="{{ user.location.street.name }}">
+						<input type="hidden" name="postcode" value="{{ user.location.postcode }}">
+						<input type="hidden" name="city" value="{{ user.location.city }}">
+						<input type="hidden" name="country" value="{{ user.location.country }}">
+						<input type="hidden" name="uuid" value="{{ user.login.uuid }}">
+						<button type="submit" class="bg-[#1C2431] hover:bg-[#87CEEB] text-white font-bold rounded px-2 pb-2 mt-6"> Ajout </button>
+					</form>
+				</div>
+
+			</div>
+		{% endfor %}
+	</div>
+{% endblock %}
