@@ -1,4 +1,6 @@
 {
+    "name": "renaulaury/the-bee-guardian",
+    "description": "Projet de gestion d'apiculture",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
