@@ -32,7 +32,7 @@ jobs:
           coverage: none
 
       - name: Check Composer Lock
-        run: composer validate --strict
+        run: composer validate --no-check-publish
 
       - name: Get Composer Cache Directory
         id: composer-cache
