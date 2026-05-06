@@ -1,13 +1,24 @@
 name: CI Symfony 7.3 - Quality Control
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "master", "main", "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master", "main" ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    # On lance un container MySQL pour les tests
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: symfony_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
       - name: Checkout Code
@@ -16,8 +27,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3' # On prend la plus stable pour Symfony 7.3
-          extensions: mbstring, xml, ctl, iconv, intl
+          php-version: '8.3'
+          extensions: mbstring, xml, ctl, iconv, intl, pdo_mysql # pdo_mysql est requis ici
           coverage: none
 
       - name: Check Composer Lock
@@ -43,16 +54,17 @@ jobs:
           php bin/console lint:twig templates
           php bin/console lint:container
 
-      - name: Setup Database (SQLite for Speed)
+      - name: Setup Database
         env:
-          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+          # On se connecte au service mysql lancé plus haut (127.0.0.1)
+          DATABASE_URL: "mysql://root:password@127.0.0.1:3306/symfony_test?serverVersion=8.0"
         run: |
-          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
       - name: Run PHPUnit Tests
         env:
-          DATABASE_URL: "sqlite:///%kernel.project_dir%/var/data.db"
+          DATABASE_URL: "mysql://root:password@127.0.0.1:3306/symfony_test?serverVersion=8.0"
         run: php bin/phpunit
 
       - name: Security Check
